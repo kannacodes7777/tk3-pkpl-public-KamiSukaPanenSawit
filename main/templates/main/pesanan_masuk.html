@@ -1,0 +1,25 @@
+{% extends 'main/base.html' %}
+{% block title %}Pesanan Masuk — Ride-Hailing{% endblock %}
+{% block page_title %}Pesanan Masuk{% endblock %}
+{% block page_sub %}Pilih pesanan yang ingin diambil{% endblock %}
+
+{% block content %}
+{% for p in data_pesanan %}
+<div class="incoming-card">
+    <div class="incoming-header">
+        <span class="incoming-passenger">{{ p.penumpang.username }}</span>
+        <a href="{% url 'main:ambil_pesanan' p.pk %}" class="btn-accept">Ambil Pesanan</a>
+    </div>
+    <div class="route-point route-from">
+        <span class="route-dot hollow"></span> {{ p.titik_jemput }}
+    </div>
+    <div style="margin: 3px 0 0 3px; width: 1px; height: 8px; background: var(--navy-light);"></div>
+    <div class="route-point route-to">
+        <span class="route-dot filled"></span> {{ p.titik_tujuan }}
+    </div>
+    <div class="incoming-meta">Dipesan {{ p.waktu_pesan|date:"H:i" }}</div>
+</div>
+{% empty %}
+<div class="empty-card">Tidak ada pesanan masuk saat ini. Tunggu sebentar...</div>
+{% endfor %}
+{% endblock content %}

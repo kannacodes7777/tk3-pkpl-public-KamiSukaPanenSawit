@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ride-Hailing PKPL{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'main/css/style.css' %}?v=999">
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<div class="app-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-icon">⬡</span>
+            <div>
+                <div class="sidebar-brand-name">Ride-Hailing</div>
+                <div class="sidebar-brand-sub">Platform Transportasi</div>
+            </div>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="sidebar-user-avatar">{{ user.username|slice:":2"|upper }}</div>
+            <div>
+                <div class="sidebar-user-name">{{ user.username }}</div>
+                <div class="sidebar-user-role">{{ user.role|capfirst }}</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-label">Menu Utama</div>
+
+            <a href="{% url 'main:dashboard' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <span class="nav-icon">◈</span> Dashboard
+            </a>
+
+            {% if user.role == 'penumpang' %}
+                <a href="{% url 'main:buat_pesanan' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'buat_pesanan' %}active{% endif %}">
+                    <span class="nav-icon">✦</span> Pesan Ojek
+                </a>
+                <a href="{% url 'main:riwayat' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'riwayat' %}active{% endif %}">
+                    <span class="nav-icon">◷</span> Riwayat Pesanan
+                </a>
+                <a href="{% url 'main:rating_list' %}" class="sidebar-nav-item {% if 'rating' in request.resolver_match.url_name %}active{% endif %}">
+                    <span class="nav-icon">★</span> Rating Driver
+                </a>
+
+            {% elif user.role == 'pengemudi' %}
+                <a href="{% url 'main:pesanan_masuk' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'pesanan_masuk' %}active{% endif %}">
+                    <span class="nav-icon">⊕</span> Pesanan Masuk
+                </a>
+                <a href="{% url 'main:riwayat' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'riwayat' %}active{% endif %}">
+                    <span class="nav-icon">◷</span> Riwayat Antar
+                </a>
+                <a href="{% url 'main:rating_saya' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'rating_saya' %}active{% endif %}">
+                    <span class="nav-icon">★</span> Rating Saya
+                </a>
+
+            {% elif user.role == 'penyedia' %}
+                <a href="{% url 'main:semua_transaksi' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'semua_transaksi' %}active{% endif %}">
+                    <span class="nav-icon">≡</span> Semua Transaksi
+                </a>
+                <a href="{% url 'main:rating_review' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'rating_review' %}active{% endif %}">
+                    <span class="nav-icon">★</span> Rating & Review
+                </a>
+            {% endif %}
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{% url 'main:logout' %}" class="btn-logout" id="logout-link">
+                <span>⎋</span> Logout
+            </a>
+        </div>
+    </aside>
+
+    <div class="main-area">
+        <header class="topbar">
+            <div class="topbar-left">
+                <span class="topbar-title">{% block page_title %}Dashboard{% endblock %}</span>
+                <span class="topbar-sep">·</span>
+                <span class="topbar-sub">{% block page_sub %}Ringkasan aktivitas{% endblock %}</span>
+            </div>
+        </header>
+
+{% else %}
+    <nav class="navbar">
+        <div class="nav-brand">⬡ Ride-Hailing App</div>
+        <div class="nav-links">
+            <a href="{% url 'main:login' %}">Login</a>
+        </div>
+    </nav>
+{% endif %}
+
+        {% if messages %}
+            <div class="alert-container" {% if user.is_authenticated %}style="padding: 0 1.5rem;"{% endif %}>
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <main class="{% if user.is_authenticated %}page-content{% else %}container{% endif %}">
+            {% block content %}{% endblock content %}
+        </main>
+
+{% if user.is_authenticated %}
+    </div> 
+</div> 
+{% endif %}
+
+<script src="{% static 'main/js/script.js' %}?v=999"></script>
+</body>
+</html>

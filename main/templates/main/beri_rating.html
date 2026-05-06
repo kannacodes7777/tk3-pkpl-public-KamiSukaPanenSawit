@@ -1,0 +1,74 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Beri Rating — Ride-Hailing{% endblock %}
+{% block page_title %}Beri Rating{% endblock %}
+{% block page_sub %}Bagaimana perjalanan Anda dengan {{ pesanan.pengemudi.username }}?{% endblock %}
+
+{% block content %}
+<div class="incoming-card" style="margin-bottom: 1.5rem; border-color: rgba(234,179,8,0.2);">
+    <h3 class="section-title" style="margin-top: 0; color: var(--text);">Ringkasan Perjalanan</h3>
+    
+    <div class="active-order-route">
+        <div class="route-point route-from">
+            <span class="route-dot hollow"></span> 
+            <span>{{ pesanan.titik_jemput }}</span>
+        </div>
+        <div style="margin: 4px 0 4px 3px; width: 1px; height: 12px; background: var(--border);"></div>
+        <div class="route-point route-to">
+            <span class="route-dot filled"></span> 
+            <span>{{ pesanan.titik_tujuan }}</span>
+        </div>
+    </div>
+    
+    <div class="incoming-meta" style="margin-top: 0.75rem;">
+        Selesai pada: {{ pesanan.waktu_pesan|date:"d M Y, H:i" }}
+    </div>
+</div>
+
+<div class="form-wrapper" style="max-width: 100%; margin: 0;">
+    <form method="POST" id="rating-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label style="margin-bottom: 1rem; display: block;">PILIH SKOR BINTANG</label>
+            
+            <div class="bintang-container">
+                <span class="bintang-item" data-val="5">★</span>
+                <span class="bintang-item" data-val="4">★</span>
+                <span class="bintang-item" data-val="3">★</span>
+                <span class="bintang-item" data-val="2">★</span>
+                <span class="bintang-item" data-val="1">★</span>
+            </div>
+
+            <div style="display: none;">
+                {{ form.skor }}
+            </div>
+
+            {% if form.skor.errors %}
+                <div class="alert alert-error" style="margin-top: 0.5rem; padding: 0.5rem;">
+                    Rating wajib diisi! Silakan klik bintang di atas.
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.ulasan.id_for_label }}" style="margin-top: 1rem;">Ulasan Anda</label>
+            {{ form.ulasan }}
+            {% if form.ulasan.errors %}
+                <div class="alert alert-error" style="margin-top: 0.5rem; padding: 0.5rem;">
+                    {{ form.ulasan.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+            <button type="submit" class="btn-primary">
+                Kirim Rating
+            </button>
+            <a href="{% url 'main:rating_list' %}" class="btn-logout" style="border: 1px solid var(--border); justify-content: center;">
+                Batal
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock content %}

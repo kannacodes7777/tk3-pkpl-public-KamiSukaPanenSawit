@@ -1,0 +1,45 @@
+{% extends 'main/base.html' %}
+{% block title %}Semua Transaksi — Ride-Hailing{% endblock %}
+{% block page_title %}Semua Transaksi{% endblock %}
+{% block page_sub %}Log lengkap seluruh pengguna{% endblock %}
+
+{% block content %}
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Penumpang</th>
+                <th>Pengemudi</th>
+                <th>Titik Jemput</th>
+                <th>Tujuan</th>
+                <th>Status</th>
+                <th>Waktu</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in data_pesanan %}
+            <tr>
+                <td class="row-num">{{ forloop.counter }}</td>
+                <td>{{ p.penumpang.username }}</td>
+                <td>{{ p.pengemudi.username|default:"—" }}</td>
+                <td>{{ p.titik_jemput }}</td>
+                <td>{{ p.titik_tujuan }}</td>
+                <td>
+                    <span class="badge
+                        {% if p.status == 'Selesai' %}selesai
+                        {% elif p.status == 'Dibatalkan' %}dibatalkan
+                        {% elif p.status == 'Sedang Diantar' %}sedang
+                        {% endif %}">
+                        {{ p.status }}
+                    </span>
+                </td>
+                <td>{{ p.waktu_pesan|date:"d/m H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr class="empty-row"><td colspan="7">Belum ada transaksi tercatat.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

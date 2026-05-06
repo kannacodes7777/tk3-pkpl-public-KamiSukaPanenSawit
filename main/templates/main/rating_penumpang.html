@@ -1,0 +1,51 @@
+{% extends 'main/base.html' %}
+{% block title %}Rating Driver — Ride-Hailing{% endblock %}
+{% block page_title %}Rating Driver{% endblock %}
+{% block page_sub %}Beri ulasan untuk perjalanan Anda{% endblock %}
+
+{% block content %}
+
+{% if selesai_tanpa_rating %}
+    <h3 class="section-title">Belum Diberi Rating</h3>
+    {% for p in selesai_tanpa_rating %}
+    <div class="incoming-card" style="border-color: rgba(234,179,8,0.2);">
+        <div class="incoming-header">
+            <span class="incoming-passenger">Driver: {{ p.pengemudi.username|default:"—" }}</span>
+            <a href="{% url 'main:beri_rating' p.pk %}" class="btn-accept">Beri Rating ★</a>
+        </div>
+        <div class="route-point route-from"><span class="route-dot hollow"></span> {{ p.titik_jemput }}</div>
+        <div style="margin: 3px 0 0 3px; width: 1px; height: 8px; background: var(--navy-light);"></div>
+        <div class="route-point route-to"><span class="route-dot filled"></span> {{ p.titik_tujuan }}</div>
+        <div class="incoming-meta">{{ p.waktu_pesan|date:"d/m H:i" }}</div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-card" style="margin-bottom: 1.5rem;">Semua perjalanan sudah diberi rating.</div>
+{% endif %}
+
+<h3 class="section-title">Riwayat Rating</h3>
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr><th>Pengemudi</th><th>Rating</th><th>Ulasan</th><th>Waktu</th></tr>
+        </thead>
+        <tbody>
+            {% for r in sudah_dirating %}
+            <tr>
+                <td>{{ r.pengemudi.username }}</td>
+                <td>
+                    <span style="color: var(--warning);">
+                        {% for i in "12345" %}{% if forloop.counter <= r.skor %}★{% else %}☆{% endif %}{% endfor %}
+                    </span>
+                    ({{ r.skor }})
+                </td>
+                <td>{{ r.ulasan|default:"—" }}</td>
+                <td>{{ r.waktu|date:"d/m H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr class="empty-row"><td colspan="4">Belum ada rating yang diberikan.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

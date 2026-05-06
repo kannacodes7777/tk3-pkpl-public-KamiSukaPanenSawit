@@ -1,0 +1,41 @@
+{% extends 'main/base.html' %}
+{% block title %}Rating Saya — Ride-Hailing{% endblock %}
+{% block page_title %}Rating Saya{% endblock %}
+{% block page_sub %}Ulasan dari penumpang{% endblock %}
+
+{% block content %}
+
+<div class="rating-summary-card" style="margin-bottom: 1.5rem;">
+    <div class="rating-big">
+        {% if avg_rating %}{{ avg_rating|floatformat:1 }}{% else %}—{% endif %}
+    </div>
+    <div>
+        <div class="stars-row">
+            {% for i in "12345" %}
+                <span class="star {% if avg_rating and forloop.counter <= avg_rating|floatformat:'0'|add:'0' %}filled{% else %}empty{% endif %}">★</span>
+            {% endfor %}
+        </div>
+        <div class="rating-meta">{{ jumlah }} ulasan diterima</div>
+    </div>
+</div>
+
+<h3 class="section-title">Semua Ulasan</h3>
+
+{% for r in semua_rating %}
+<div class="review-card">
+    <div class="review-header">
+        <span class="review-author">{{ r.penumpang.username }}</span>
+        <div class="stars-row">
+            {% for i in "12345" %}
+                <span class="star {% if forloop.counter <= r.skor %}filled{% else %}empty{% endif %}">★</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% if r.ulasan %}<p class="review-text">"{{ r.ulasan }}"</p>{% endif %}
+    <div class="review-time">{{ r.waktu|date:"d/m H:i" }}</div>
+</div>
+{% empty %}
+<div class="empty-card">Belum ada ulasan yang masuk.</div>
+{% endfor %}
+
+{% endblock content %}

@@ -1,0 +1,70 @@
+{% extends 'main/base.html' %}
+{% block title %}Rating & Review — Ride-Hailing{% endblock %}
+{% block page_title %}Rating & Review{% endblock %}
+{% block page_sub %}Performa seluruh pengemudi platform{% endblock %}
+
+{% block content %}
+
+<div class="stat-grid-3" style="margin-bottom: 1.5rem;">
+    <div class="stat-card stat-teal">
+        <div class="stat-value">
+            {% if avg_platform %}{{ avg_platform|floatformat:1 }}{% else %}—{% endif %}
+        </div>
+        <div class="stat-label">Avg Rating Platform</div>
+    </div>
+    <div class="stat-card stat-sky">
+        <div class="stat-value">{{ total_review }}</div>
+        <div class="stat-label">Total Review</div>
+    </div>
+    <div class="stat-card stat-green">
+        <div class="stat-value">{{ driver_aktif }}</div>
+        <div class="stat-label">Driver Aktif</div>
+    </div>
+</div>
+
+<h3 class="section-title">Performa Per Pengemudi</h3>
+<div class="table-wrapper" style="margin-bottom: 1.5rem;">
+    <table class="data-table">
+        <thead>
+            <tr><th>Pengemudi</th><th>Avg Rating</th><th>Jumlah Review</th><th>Total Antar</th></tr>
+        </thead>
+        <tbody>
+            {% for ds in driver_stats %}
+            <tr>
+                <td>{{ ds.driver.username }}</td>
+                <td>
+                    {% if ds.avg_rating %}
+                        <span style="color: var(--warning);">★</span> {{ ds.avg_rating|floatformat:1 }}
+                    {% else %}—{% endif %}
+                </td>
+                <td>{{ ds.jumlah }}</td>
+                <td>{{ ds.total_antar }}</td>
+            </tr>
+            {% empty %}
+            <tr class="empty-row"><td colspan="4">Belum ada pengemudi terdaftar.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h3 class="section-title">Semua Ulasan</h3>
+{% for r in semua_rating %}
+<div class="review-card">
+    <div class="review-header">
+        <span class="review-author">
+            {{ r.penumpang.username }} → <strong>{{ r.pengemudi.username }}</strong>
+        </span>
+        <div class="stars-row">
+            {% for i in "12345" %}
+                <span class="star {% if forloop.counter <= r.skor %}filled{% else %}empty{% endif %}">★</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% if r.ulasan %}<p class="review-text">"{{ r.ulasan }}"</p>{% endif %}
+    <div class="review-time">{{ r.waktu|date:"d/m H:i" }}</div>
+</div>
+{% empty %}
+<div class="empty-card">Belum ada ulasan di platform ini.</div>
+{% endfor %}
+
+{% endblock content %}

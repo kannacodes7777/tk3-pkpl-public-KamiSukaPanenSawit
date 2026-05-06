@@ -1,0 +1,224 @@
+{% extends 'main/base.html' %}
+{% block title %}Dashboard — Ride-Hailing{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_sub %}Ringkasan aktivitas Anda{% endblock %}
+
+{% block content %}
+
+{# ═══════════ PENUMPANG ═══════════ #}
+{% if user.role == 'penumpang' %}
+
+<div class="stat-grid-3">
+    <div class="stat-card stat-teal">
+        <div class="stat-value">{{ total_pesanan }}</div>
+        <div class="stat-label">Total Pesanan</div>
+    </div>
+    <div class="stat-card stat-sky">
+        <div class="stat-value">{{ pesanan_berjalan }}</div>
+        <div class="stat-label">Sedang Berjalan</div>
+    </div>
+    <div class="stat-card stat-green">
+        <div class="stat-value">
+            {% if avg_rating_driver %}{{ avg_rating_driver|floatformat:1 }}{% else %}—{% endif %}
+        </div>
+        <div class="stat-label">Avg Rating Driver</div>
+    </div>
+</div>
+
+{% if pesanan_aktif %}
+    <h3 class="section-title">Perjalanan Aktif</h3>
+    <div class="active-order-card">
+        <div class="active-order-route">
+            <div class="route-point route-from">
+                <span class="route-dot hollow"></span>
+                {{ pesanan_aktif.titik_jemput }}
+            </div>
+            <div class="route-line"></div>
+            <div class="route-point route-to">
+                <span class="route-dot filled"></span>
+                {{ pesanan_aktif.titik_tujuan }}
+            </div>
+        </div>
+        <div class="active-order-meta">
+            <span class="badge {% if pesanan_aktif.status == 'Sedang Diantar' %}sedang{% else %}menunggu{% endif %}">
+                {{ pesanan_aktif.status }}
+            </span>
+            <span class="meta-time">{{ pesanan_aktif.waktu_pesan|date:"H:i" }}</span>
+        </div>
+    </div>
+{% else %}
+    <h3 class="section-title">Perjalanan Aktif</h3>
+    <div class="empty-card">
+        Tidak ada perjalanan aktif.
+        <a href="{% url 'main:buat_pesanan' %}" class="btn-primary" style="margin-left: 1rem;">+ Pesan Sekarang</a>
+    </div>
+{% endif %}
+
+<div class="section-header-row">
+    <h3 class="section-title" style="margin: 0;">5 Riwayat Terakhir</h3>
+    <a href="{% url 'main:riwayat' %}" class="link-more">Lihat semua →</a>
+</div>
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead><tr><th>Titik Jemput</th><th>Tujuan</th><th>Status</th><th>Waktu</th></tr></thead>
+        <tbody>
+            {% for p in riwayat_singkat %}
+            <tr>
+                <td>{{ p.titik_jemput }}</td>
+                <td>{{ p.titik_tujuan }}</td>
+                <td><span class="badge selesai">{{ p.status }}</span></td>
+                <td>{{ p.waktu_pesan|date:"H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr class="empty-row"><td colspan="4">Belum ada riwayat pesanan.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{# ═══════════ PENGEMUDI ═══════════ #}
+{% elif user.role == 'pengemudi' %}
+
+<div class="stat-grid-3">
+    <div class="stat-card stat-teal">
+        <div class="stat-value">{{ antar_hari_ini }}</div>
+        <div class="stat-label">Antar Hari Ini</div>
+    </div>
+    <div class="stat-card stat-sky">
+        <div class="stat-value">{{ pesanan_masuk_count }}</div>
+        <div class="stat-label">Pesanan Masuk</div>
+    </div>
+    <div class="stat-card stat-green">
+        <div class="stat-value">
+            {% if rating_saya %}{{ rating_saya|floatformat:1 }}{% else %}—{% endif %}
+        </div>
+        <div class="stat-label">Rating Saya</div>
+    </div>
+</div>
+
+<h3 class="section-title">Rating Saya</h3>
+<div class="rating-summary-card">
+    <div class="rating-big">
+        {% if rating_saya %}{{ rating_saya|floatformat:1 }}{% else %}—{% endif %}
+    </div>
+    <div>
+        <div class="stars-row">
+            {% for i in "12345" %}
+                {% if forloop.counter <= rating_saya|floatformat:"0"|add:"0" %}
+                    <span class="star filled">★</span>
+                {% else %}
+                    <span class="star empty">★</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="rating-meta">dari {{ jumlah_ulasan }} ulasan</div>
+    </div>
+</div>
+
+<div class="section-header-row">
+    <h3 class="section-title" style="margin: 0;">Pesanan Masuk Terbaru</h3>
+    <a href="{% url 'main:pesanan_masuk' %}" class="link-more">Lihat semua →</a>
+</div>
+{% for p in pesanan_masuk_preview %}
+<div class="incoming-card">
+    <div class="incoming-header">
+        <span class="incoming-passenger">{{ p.penumpang.username }}</span>
+        <a href="{% url 'main:ambil_pesanan' p.pk %}" class="btn-accept">Ambil Pesanan</a>
+    </div>
+    <div class="route-point route-from"><span class="route-dot hollow"></span>{{ p.titik_jemput }}</div>
+    <div style="margin: 3px 0 0 3px; width: 1px; height: 8px; background: var(--navy-light);"></div>
+    <div class="route-point route-to"><span class="route-dot filled"></span>{{ p.titik_tujuan }}</div>
+    <div class="incoming-meta">{{ p.waktu_pesan|date:"H:i" }}</div>
+</div>
+{% empty %}
+<div class="empty-card">Tidak ada pesanan masuk saat ini.</div>
+{% endfor %}
+
+<div class="section-header-row" style="margin-top: 1.5rem;">
+    <h3 class="section-title" style="margin: 0;">Ulasan Terbaru</h3>
+    <a href="{% url 'main:rating_saya' %}" class="link-more">Lihat semua →</a>
+</div>
+{% for r in ulasan_terbaru %}
+<div class="review-card">
+    <div class="review-header">
+        <span class="review-author">{{ r.penumpang.username }}</span>
+        <div class="stars-row">
+            {% for i in "12345" %}
+                <span class="star {% if forloop.counter <= r.skor %}filled{% else %}empty{% endif %}">★</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% if r.ulasan %}<p class="review-text">{{ r.ulasan }}</p>{% endif %}
+</div>
+{% empty %}
+<div class="empty-card">Belum ada ulasan.</div>
+{% endfor %}
+
+
+{# ═══════════ PENYEDIA ═══════════ #}
+{% elif user.role == 'penyedia' %}
+
+<div class="monitor-panel">
+    <div class="monitor-header">
+        <div class="monitor-title">
+            <span class="monitor-icon">⬡</span>
+            <div>
+                <h2>Panel Monitoring Sistem</h2>
+                <p>Memantau seluruh aktivitas transaksi platform secara real-time</p>
+            </div>
+        </div>
+        <span class="live-badge">● LIVE</span>
+    </div>
+    <div class="stat-grid">
+        <div class="stat-card stat-total">
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Total Pesanan</div>
+        </div>
+        <div class="stat-card stat-waiting">
+            <div class="stat-value">{{ stats.menunggu }}</div>
+            <div class="stat-label">Menunggu Driver</div>
+        </div>
+        <div class="stat-card stat-done">
+            <div class="stat-value">{{ stats.selesai }}</div>
+            <div class="stat-label">Selesai</div>
+        </div>
+        <div class="stat-card stat-cancel">
+            <div class="stat-value">{{ stats.dibatalkan }}</div>
+            <div class="stat-label">Dibatalkan</div>
+        </div>
+    </div>
+</div>
+
+<div class="section-header-row">
+    <h3 class="section-title" style="margin: 0;">5 Transaksi Terbaru</h3>
+    <a href="{% url 'main:semua_transaksi' %}" class="link-more">Lihat semua →</a>
+</div>
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr><th>#</th><th>Penumpang</th><th>Jemput</th><th>Tujuan</th><th>Status</th><th>Waktu</th></tr>
+        </thead>
+        <tbody>
+            {% for p in riwayat_singkat %}
+            <tr>
+                <td class="row-num">{{ forloop.counter }}</td>
+                <td>{{ p.penumpang.username }}</td>
+                <td>{{ p.titik_jemput }}</td>
+                <td>{{ p.titik_tujuan }}</td>
+                <td>
+                    <span class="badge {% if p.status == 'Selesai' %}selesai{% elif p.status == 'Dibatalkan' %}dibatalkan{% endif %}">
+                        {{ p.status }}
+                    </span>
+                </td>
+                <td>{{ p.waktu_pesan|date:"d/m H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr class="empty-row"><td colspan="6">Belum ada transaksi.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endif %}
+{% endblock content %}

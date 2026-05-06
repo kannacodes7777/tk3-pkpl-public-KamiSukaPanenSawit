@@ -1,0 +1,66 @@
+{% extends 'main/base.html' %}
+{% block title %}Riwayat — Ride-Hailing{% endblock %}
+{% block page_title %}{% if user.role == 'pengemudi' %}Riwayat Antar{% else %}Riwayat Pesanan{% endif %}{% endblock %}
+{% block page_sub %}Semua perjalanan yang tercatat{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <form method="GET" action="" class="search-form secure-form">
+        <input type="text" name="q" class="search-input" placeholder="Cari titik jemput atau tujuan..." value="{{ search_query }}">
+        <button type="submit" class="btn-primary">Cari</button>
+    </form>
+</div>
+
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                {% if user.role == 'pengemudi' %}
+                    <th>Penumpang</th>
+                {% endif %}
+                <th>Titik Jemput</th>
+                <th>Tujuan</th>
+                <th>Status</th>
+                <th>Waktu</th>
+                {% if user.role == 'pengemudi' %}
+                    <th>Aksi</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in data_pesanan %}
+            <tr>
+                {% if user.role == 'pengemudi' %}
+                    <td>{{ p.penumpang.username }}</td>
+                {% endif %}
+                <td>{{ p.titik_jemput }}</td>
+                <td>{{ p.titik_tujuan }}</td>
+                <td>
+                    <span class="badge
+                        {% if p.status == 'Selesai' %}selesai
+                        {% elif p.status == 'Dibatalkan' %}dibatalkan
+                        {% elif p.status == 'Sedang Diantar' %}sedang
+                        {% endif %}">
+                        {{ p.status }}
+                    </span>
+                </td>
+                <td>{{ p.waktu_pesan|date:"d/m H:i" }}</td>
+                {% if user.role == 'pengemudi' and p.status == 'Sedang Diantar' %}
+                    <td>
+                        <a href="{% url 'main:selesai_pesanan' p.pk %}" class="btn-accept">Selesaikan</a>
+                    </td>
+                {% elif user.role == 'pengemudi' %}
+                    <td>—</td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr class="empty-row">
+                <td colspan="{% if user.role == 'pengemudi' %}6{% else %}4{% endif %}">
+                    Belum ada riwayat perjalanan.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

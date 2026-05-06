@@ -1,0 +1,28 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="form-wrapper">
+    <h2>Form Pemesanan Ojek</h2>
+    <form action="" method="POST" class="secure-form">
+        {% csrf_token %} <!-- Wajib untuk mitigasi CSRF -->
+        
+        <div class="form-group">
+            <label for="titik_jemput">Titik Jemput</label>
+            <!-- Client-side validation: Max length dan Regex pattern -->
+            <input type="text" id="titik_jemput" name="titik_jemput" required 
+                   maxlength="255" pattern="[a-zA-Z0-9\s.,-]+" 
+                   title="Gunakan huruf, angka, spasi, titik, koma, atau strip">
+        </div>
+        
+        <div class="form-group">
+            <label for="titik_tujuan">Titik Tujuan</label>
+            <!-- Client-side validation -->
+            <input type="text" id="titik_tujuan" name="titik_tujuan" required 
+                   maxlength="255" pattern="[a-zA-Z0-9\s.,-]+" 
+                   title="Gunakan huruf, angka, spasi, titik, koma, atau strip">
+        </div>
+        
+        <button type="submit" class="btn-primary">Konfirmasi Pesanan</button>
+    </form>
+</div>
+{% endblock content %}
