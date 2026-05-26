@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
 from .sanitizers import (
     sanitize_input,
+    sanitize_review_text,
     validate_location_allowlist,
     validate_no_injection,
     validate_review_allowlist,
@@ -79,7 +80,7 @@ class Rating(models.Model):
         if self.ulasan:
             validate_review_allowlist(self.ulasan)
             validate_no_injection(self.ulasan)
-            self.ulasan = sanitize_input(self.ulasan)
+            self.ulasan = sanitize_review_text(self.ulasan)
 
     def save(self, *args, **kwargs):
         """Validate the full model before saving."""

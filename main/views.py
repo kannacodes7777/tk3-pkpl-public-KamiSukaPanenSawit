@@ -50,7 +50,7 @@ def login_view(request):
             return redirect('main:dashboard')
         else:
             cache.set(cache_key, attempts + 1, timeout=300)
-            messages.error(request, f"Kredensial salah. Sisa percobaan: {4 - attempts}")
+            messages.error(request, "Username atau password salah.")
 
     return render(request, 'main/login.html')
 
@@ -205,6 +205,8 @@ def beri_rating(request, pk):
             rating.save()
             messages.success(request, "Terima kasih! Rating berhasil dikirim.")
             return redirect('main:rating_list')
+        else:
+            messages.error(request, "Gagal memproses ulasan. Periksa kembali input Anda.")
     else:
         form = RatingForm()
 

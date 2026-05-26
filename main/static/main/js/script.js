@@ -26,13 +26,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 5000);
     });
 
-    const allowedPattern = /^[a-zA-Z0-9\s.,-]+$/;
+    const allowedPattern = /^[a-zA-Z0-9\s.,\-{}%*_<>="'/()\[\]:;!?]+$/;
     document.querySelectorAll('input[type="text"]').forEach(input => {
         input.addEventListener('input', function () {
             if (this.value !== "" && !allowedPattern.test(this.value)) {
-                this.value = this.value.replace(/[^a-zA-Z0-9\s.,-]/g, '');
+                this.value = this.value.replace(/[^a-zA-Z0-9\s.,\-{}%*_<>="'/()\[\]:;!?]/g, '');
                 this.classList.add('input-error');
                 setTimeout(() => this.classList.remove('input-error'), 800);
+            }
+        });
+    });
+
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(textarea => {
+        textarea.addEventListener('input', function () {
+            if (this.value !== "" && !allowedPattern.test(this.value)) {
+                this.value = this.value.replace(/[^a-zA-Z0-9\s.,\-{}%*_<>="'/()\[\]:;!?]/g, '');
             }
         });
     });

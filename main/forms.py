@@ -6,6 +6,7 @@ from .sanitizers import (
     validate_location_allowlist,
     validate_no_injection,
     validate_review_allowlist,
+    sanitize_review_text,
     validate_username_allowlist,
 )
 
@@ -75,6 +76,6 @@ class RatingForm(forms.ModelForm):
         
         validate_no_injection(ulasan)
         validate_review_allowlist(ulasan)
-        ulasan = sanitize_input(ulasan, allow_basic_html=False)
+        ulasan = sanitize_review_text(ulasan)
         
         return ulasan

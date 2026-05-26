@@ -21,9 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-xm2wm*u#hxc1w*)!5_!($gujbxb)l^2i*psvp9gkt72gjpl6rf'
 
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
-DEBUG = True
+DEBUG = not PRODUCTION
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+if PRODUCTION:
+    ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS_DOMAIN', 'localhost')]
+else:
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 
 
@@ -108,8 +111,8 @@ STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = 'main.CustomUser'
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True 
-SESSION_COOKIE_AGE = 360 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 360
 SESSION_SAVE_EVERY_REQUEST = True
 
 
